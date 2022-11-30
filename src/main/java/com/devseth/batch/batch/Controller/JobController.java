@@ -1,17 +1,17 @@
 package com.devseth.batch.batch.Controller;
 
+import com.devseth.batch.batch.request.JobParams;
+import com.devseth.batch.batch.service.JobService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,25 +19,12 @@ import java.util.Map;
 public class JobController {
 
     @Autowired
-    JobLauncher jobLauncher;
-    @Qualifier("firstJob")
-    @Autowired
-    Job firstJob;
-    @Qualifier("secondJob")
-    @Autowired
-    Job secondJob;
+    JobService jobService;
 
     @GetMapping("start/{jobName}")
-    public String StartJob(@PathVariable String jobName) throws Exception{
-        Map<String, JobParameter> params = new HashMap<>();
-        params.put("currentTime", new JobParameter(System.currentTimeMillis()));
-        JobParameters jobParameters = new JobParameters(params);
-        if(jobName.equals("First job")){
-            jobLauncher.run(firstJob, jobParameters);
-        } else if(jobName.equals("second job")) {
-            jobLauncher.run(secondJob, jobParameters);
-        }
-
+    public String StartJob(@PathVariable String jobName,
+                           @RequestBody List<JobParams> jobParamsList) throws Exception{
+        jobService.startJob(jobName,jobParamsList);
         return "Job Started .... ";
     }
 }
